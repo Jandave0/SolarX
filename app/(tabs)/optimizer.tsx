@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -120,13 +120,9 @@ export default function OptimizerScreen() {
         <GlassPanel className="h-80 items-center justify-center overflow-hidden">
           {/* Alignment Glow */}
           <Animated.View
+            className="absolute w-[120px] h-[120px] rounded-full bg-primary-container"
             style={[
               {
-                position: 'absolute',
-                width: 120,
-                height: 120,
-                borderRadius: 60,
-                backgroundColor: '#FFB703',
                 opacity: 0.2,
               },
               glowStyle
@@ -135,14 +131,16 @@ export default function OptimizerScreen() {
 
           {/* Target Reticle */}
           <View
-            style={[
-              styles.targetReticle,
-              { borderColor: isAligned ? '#FFB703' : 'rgba(255,255,255,0.2)' }
-            ]}
+            className={`w-[60px] h-[60px] rounded-full border-2 border-dashed absolute ${
+              isAligned ? 'border-primary-container' : 'border-white/20'
+            }`}
           />
 
           {/* Moving Bubble */}
-          <Animated.View style={[styles.bubble, bubbleStyle] as any}>
+          <Animated.View 
+            className="w-[40px] h-[40px] rounded-full shadow-[0_0_10px_#FFB703] elevation-5" 
+            style={[bubbleStyle] as any}
+          >
             <View className="w-full h-full rounded-full bg-primary" />
             <View className="absolute w-4 h-4 rounded-full bg-white opacity-40 top-2 left-2" />
           </Animated.View>
@@ -204,23 +202,3 @@ export default function OptimizerScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  targetReticle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    position: 'absolute',
-  },
-  bubble: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    shadowColor: '#FFB703',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 5,
-  }
-});

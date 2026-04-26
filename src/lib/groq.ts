@@ -62,17 +62,20 @@ export const queryGroq = async (messages: ChatMessage[], model = 'llama-3.3-70b-
 /**
  * Specialized function for RAG-based hardware recommendation
  */
+
 export const getHardwareRecommendation = async (userContext: string, retrievedContext: string) => {
   const systemPrompt = `You are the SolarX AI Expert. 
-  Use the following TECHNICAL SPECIFICATIONS of solar hardware to answer the user's request.
-  Technical Context:
-  ${retrievedContext}
+  Use these TECHNICAL SPECIFICATIONS: ${retrievedContext}
   
-  Provide a concise, technical recommendation based on the user's specific solar site conditions. 
-  Use Philippine Pesos (₱) for all currency and cost-related data.`;
+  RESPONSE RULES:
+  - Be EXTREMELY concise. Use bullet points.
+  - Structure: 1. Recommended Hardware, 2. Why it fits, 3. Estimated Cost (in Philippine Pesos ₱).
+  - Use Philippine Pesos (₱) for ALL costs. Assume 1 USD = 56 PHP if needed.
+  - Do not use conversational filler (e.g., "I recommend...", "Based on the context...").
+  - Use bolding for key specs.`;
 
   return await queryGroq([
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: userContext }
+    { role: "system", content: systemPrompt },
+    { role: "user", content: `Conditions: ${userContext}` }
   ]);
 };

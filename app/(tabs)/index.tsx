@@ -12,9 +12,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { useSQLiteContext, AssessmentRecord } from '@/src/services/database';
 import React, { useEffect, useState } from 'react';
+import { useEnergySimulation } from '@/src/hooks/useEnergySimulation';
 
 export default function DashboardScreen() {
   const [latestAssessment, setLatestAssessment] = useState<AssessmentRecord | null>(null);
+  const liveData = useEnergySimulation();
 
   const db = useSQLiteContext();
 
@@ -51,8 +53,8 @@ export default function DashboardScreen() {
         {/* Solar Pulse Gauge Section */}
         <View className="items-center py-4">
           <CircularGauge 
-            percentage={68} 
-            label="6.4" 
+            percentage={(liveData.solarProduction / 10) * 100} 
+            label={liveData.solarProduction.toString()} 
             subLabel="kW PRODUCED" 
             color="#FFB703" 
             size={220}
@@ -62,9 +64,9 @@ export default function DashboardScreen() {
 
         {/* Current Status Row */}
         <View className="flex-row gap-3">
-          <EnergyChip label="6.4 kW" icon="sun-wireless" status="Gold" />
-          <EnergyChip label="2.1 kW" icon="home-lightning-bolt" status="Blue" />
-          <EnergyChip label="88%" icon="battery-80" status="Blue" />
+          <EnergyChip label={`${liveData.solarProduction} kW`} icon="sun-wireless" status="Gold" />
+          <EnergyChip label={`${liveData.houseConsumption} kW`} icon="home-lightning-bolt" status="Blue" />
+          <EnergyChip label={`${liveData.batteryLevel}%`} icon={liveData.batteryLevel > 50 ? "battery-80" : "battery-30"} status="Blue" />
         </View>
 
         {/* Main Production Chart */}
@@ -81,14 +83,14 @@ export default function DashboardScreen() {
           <Card className="flex-1 p-5 gap-2">
             <Typography variant="label" className="text-text-muted">TODAY'S HARVEST</Typography>
             <View className="flex-row items-baseline gap-1">
-              <Typography variant="h2">32.4</Typography>
+              <Typography variant="h2">{liveData.dailyHarvest}</Typography>
               <Typography variant="caption" className="text-text-muted font-bold">kWh</Typography>
             </View>
             <Typography variant="caption" className="text-primary-container">+12% vs yesterday</Typography>
           </Card>
           <Card className="flex-1 p-5 gap-2">
             <Typography variant="label" className="text-text-muted">GRID SAVINGS</Typography>
-            <Typography variant="h2">₱284.12</Typography>
+            <Typography variant="h2">₱{liveData.gridSavings}</Typography>
             <Typography variant="caption" className="text-secondary-container">Monthly: ₱8,450.50</Typography>
           </Card>
         </View>
@@ -124,3 +126,4 @@ export default function DashboardScreen() {
     </ScrollView>
   );
 }
+

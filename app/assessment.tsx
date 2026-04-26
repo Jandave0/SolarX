@@ -9,19 +9,21 @@ import { Button } from '@/components/ui/Button';
 import { router } from 'expo-router';
 import { saveAssessment, useSQLiteContext } from '@/src/services/database';
 
+import Markdown from 'react-native-markdown-display';
+
 export default function AssessmentScreen() {
-  const { 
-    currentStep, 
-    location, 
-    energyUsage, 
+  const {
+    currentStep,
+    location,
+    energyUsage,
     isCalculating,
     setStep,
-    nextStep, 
-    prevStep, 
-    setLocation, 
-    setEnergyUsage, 
+    nextStep,
+    prevStep,
+    setLocation,
+    setEnergyUsage,
     setIsCalculating,
-    resetAssessment 
+    resetAssessment
   } = useAssessmentStore();
 
   const db = useSQLiteContext();
@@ -31,14 +33,14 @@ export default function AssessmentScreen() {
   const handleCalculate = async () => {
     setIsCalculating(true);
     nextStep(); // Move to result step
-    
+
     try {
       // User Context for RAG
       const userContext = `The user is located at ${location.address}. 
       Their average monthly electricity bill is ₱${energyUsage.monthlyBill} 
       and they consume ${energyUsage.kwhPerMonth} kWh per month. 
       Recommend a tailored solar energy system including panel capacity, inverter type, and storage recommendations.`;
-      
+
       // Technical Context (Reference data for the AI)
       const retrievedContext = `
       - Tier 1 Panels: SunForce 450W (Efficiency: 21.5%, Temp Coeff: -0.34%/C)
@@ -79,7 +81,7 @@ export default function AssessmentScreen() {
                 Enter your property address to analyze local irradiance.
               </Typography>
             </View>
-            
+
             <Card>
               <Typography variant="label" className="mb-3 text-primary-container">Property Address</Typography>
               <TextInput
@@ -91,9 +93,9 @@ export default function AssessmentScreen() {
               />
             </Card>
 
-            <Button 
+            <Button
               className="h-16"
-              onPress={nextStep} 
+              onPress={nextStep}
               disabled={!location.address}
             >
               Next: Energy Profile
@@ -138,16 +140,16 @@ export default function AssessmentScreen() {
             </Card>
 
             <View className="flex-row gap-4">
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 className="flex-1 h-16"
-                onPress={prevStep} 
+                onPress={prevStep}
               >
                 Back
               </Button>
-              <Button 
+              <Button
                 className="flex-[2] h-16"
-                onPress={handleCalculate} 
+                onPress={handleCalculate}
                 disabled={!energyUsage.monthlyBill || !energyUsage.kwhPerMonth}
               >
                 Generate AI Analysis
@@ -176,31 +178,43 @@ export default function AssessmentScreen() {
                 </View>
               ) : (
                 <ScrollView className="max-h-[500px]" showsVerticalScrollIndicator={false}>
-                   <Typography variant="body" className="leading-[26px] text-white/90">
-                    {aiResult || "No recommendation could be generated at this time."}
-                  </Typography>
+                  {aiResult ? (
+                    <Markdown
+                      style={{
+                        body: { color: 'rgba(255,255,255,0.9)', fontSize: 16, lineHeight: 24 },
+                        strong: { color: '#FFB703', fontWeight: 'bold' },
+                        bullet_list: { color: 'rgba(255,255,255,0.9)' },
+                      }}
+                    >
+                      {aiResult}
+                    </Markdown>
+                  ) : (
+                    <Typography variant="body" className="text-white/50 italic">
+                      No recommendation could be generated at this time.
+                    </Typography>
+                  )}
                 </ScrollView>
               )}
             </GlassPanel>
 
             {!isCalculating && (
               <View className="gap-4">
-                <Button 
+                <Button
                   className="h-16"
                   onPress={() => {
                     resetAssessment();
                     router.replace('/(tabs)');
-                  }} 
+                  }}
                 >
                   Accept & Go to Dashboard
                 </Button>
-                <Button 
+                <Button
                   variant="secondary"
                   className="h-14"
                   onPress={() => {
                     setAiResult(null);
                     setStep(1);
-                  }} 
+                  }}
                 >
                   Start Over
                 </Button>
@@ -214,22 +228,21 @@ export default function AssessmentScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1 bg-background"
     >
-      <ScrollView 
-        className="flex-1" 
+      <ScrollView
+        className="flex-1"
         contentContainerStyle={{ padding: 24, paddingTop: 80, paddingBottom: 40 }}
       >
         <View className="mb-12 flex-row items-center justify-between">
           <View className="flex-row gap-2.5">
             {[1, 2, 3].map((step) => (
-              <View 
+              <View
                 key={step}
-                className={`h-2 w-14 rounded-full ${
-                  step <= currentStep ? 'bg-primary-container shadow-[0_0_8px_#FFB703]' : 'bg-white/10'
-                }`}
+                className={`h-2 w-14 rounded-full ${step <= currentStep ? 'bg-primary-container shadow-[0_0_8px_#FFB703]' : 'bg-white/10'
+                  }`}
               />
             ))}
           </View>

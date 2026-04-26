@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Dimensions } from 'react-native';
 import {
   VictoryChart,
-  VictoryLine,
   VictoryArea,
   VictoryAxis,
   VictoryScatter,
 } from 'victory-native';
 import { Svg, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { Typography } from '@/components/ui/Typography';
+import { useEnergySimulation } from '@/src/hooks/useEnergySimulation';
 
 const { width } = Dimensions.get('window');
 
-const data = [
+// Base historical data to provide a baseline curve
+const BASE_HISTORY = [
   { time: 1, production: 0, consumption: 2.2 },
   { time: 4, production: 0, consumption: 1.8 },
   { time: 7, production: 0.8, consumption: 3.2 },
@@ -20,27 +21,41 @@ const data = [
   { time: 13, production: 8.2, consumption: 1.8 },
   { time: 16, production: 5.4, consumption: 4.2 },
   { time: 19, production: 1.2, consumption: 5.8 },
-  { time: 22, production: 0, consumption: 3.5 },
 ];
 
-const lastPoint = data[data.length - 1];
-
 export const EnergyFlowChart = () => {
+  const liveData = useEnergySimulation();
+
+  // Combine historical baseline with the current live data point
+  const chartData = useMemo(() => {
+    const currentHour = liveData.timestamp.getHours();
+    return [
+      ...BASE_HISTORY,
+      { 
+        time: currentHour, 
+        production: liveData.solarProduction, 
+        consumption: liveData.houseConsumption 
+      }
+    ].sort((a, b) => a.time - b.time);
+  }, [liveData]);
+
+  const lastPoint = chartData[chartData.length - 1];
+
   return (
     <View className="w-full">
       <View className="flex-row justify-between items-center mb-6 px-4">
         <View className="flex-row items-center gap-2">
-          <View className="w-2.5 h-2.5 rounded-full bg-[#FFB703]" style={{ shadowColor: '#FFB703', shadowRadius: 4, shadowOpacity: 0.5 }} />
+          <View className="w-2.5 h-2.5 rounded-full bg-[#FFB703] shadow-[0_0_4px_#FFB703]" />
           <Typography variant="label-caps" className="text-on-surface-variant">PRODUCTION</Typography>
         </View>
         <View className="flex-row items-center gap-2">
-          <View className="w-2.5 h-2.5 rounded-full bg-[#00E5FF]" style={{ shadowColor: '#00E5FF', shadowRadius: 4, shadowOpacity: 0.5 }} />
+          <View className="w-2.5 h-2.5 rounded-full bg-[#00E5FF] shadow-[0_0_4px_#00E5FF]" />
           <Typography variant="label-caps" className="text-on-surface-variant">CONSUMPTION</Typography>
         </View>
       </View>
 
-      <View style={{ height: 240 }}>
-        <Svg style={{ position: 'absolute' }}>
+      <View style={{ height: 240, width: '100%' }}>
+        <Svg style={{ position: 'absolute', width: '100%', height: '100%' }}>
           <Defs>
             <LinearGradient id="productionGradient" x1="0" y1="0" x2="0" y2="1">
               <Stop offset="0%" stopColor="#FFB703" stopOpacity="0.4" />
@@ -61,7 +76,7 @@ export const EnergyFlowChart = () => {
         >
           {/* Production Area */}
           <VictoryArea
-            data={data}
+            data={chartData}
             x="time"
             y="production"
             style={{
@@ -76,7 +91,7 @@ export const EnergyFlowChart = () => {
 
           {/* Consumption Area (Subtle) */}
           <VictoryArea
-            data={data}
+            data={chartData}
             x="time"
             y="consumption"
             style={{
@@ -126,7 +141,7 @@ export const EnergyFlowChart = () => {
             dependentAxis
             style={{
               axis: { stroke: 'transparent' },
-              tickLabels: { fill: '#8A8A9E', fontSize: 10, fontFamily: 'Plus Jakarta Sans' },
+              tickLabels: { fill: '#8A8A9E', fontSize: 10 },
               grid: { stroke: 'rgba(255,255,255,0.05)', strokeDasharray: '4,4' },
             }}
             tickFormat={(x: number) => `${x}kW`}
@@ -135,7 +150,7 @@ export const EnergyFlowChart = () => {
           <VictoryAxis
             style={{
               axis: { stroke: 'rgba(255,255,255,0.05)' },
-              tickLabels: { fill: '#8A8A9E', fontSize: 10, fontFamily: 'Plus Jakarta Sans' },
+              tickLabels: { fill: '#8A8A9E', fontSize: 10 },
             }}
             tickValues={[1, 7, 13, 19, 22]}
             tickFormat={(t: number) => `${t}:00`}
