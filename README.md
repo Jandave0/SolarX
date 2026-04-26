@@ -53,7 +53,7 @@ The application follows a custom-built design system characterized by:
 
    
 3. Set up Environment Variables Create a .env file in the root:
-   env
+   ```env
    EXPO_PUBLIC_GROQ_API_KEY=your_key_here
    EXPO_PUBLIC_SUPABASE_URL=your_url_here
    EXPO_PUBLIC_SUPABASE_ANON_KEY=your_key_here
@@ -62,4 +62,4 @@ The application follows a custom-built design system characterized by:
 
 4. Launch the application
   ```bash
-npx expo start
+   npx expo start
