@@ -8,11 +8,11 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: true,
         headerStyle: {
-          backgroundColor: '#16161A', // Base Background
+          backgroundColor: '#131317', // Deep Matte Night
         },
         headerTintColor: '#FFFFFF', // Text Color
         tabBarStyle: {
-          backgroundColor: '#16161A',
+          backgroundColor: '#131317',
           borderTopColor: 'rgba(255, 255, 255, 0.05)',
           ...Platform.select({
             ios: {

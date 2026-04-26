@@ -1,10 +1,21 @@
-import { View, ViewProps } from 'react-native';
+import { ViewProps, Pressable, PressableProps } from 'react-native';
 
-export function Card({ className = '', ...props }: ViewProps) {
+interface CardProps extends ViewProps {
+  onPress?: PressableProps['onPress'];
+  children?: React.ReactNode;
+}
+
+export function Card({ className = '', onPress, children, style, ...props }: CardProps) {
   return (
-    <View 
-      className={`bg-[#24242C] rounded-[24px] border border-white/5 p-6 ${className}`} 
+    <Pressable 
+      onPress={onPress}
+      disabled={!onPress}
+      // @ts-ignore - NativeWind style handling
+      className={`bg-[#24242C] rounded-[24px] border border-white/5 p-6 ${className}`}
+      style={style}
       {...props} 
-    />
+    >
+      {children}
+    </Pressable>
   );
 }

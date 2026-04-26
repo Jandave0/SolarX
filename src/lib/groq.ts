@@ -1,5 +1,18 @@
 import { getSecureItem } from '@/utils/storage';
 
+// ============================================================
+// SECURITY AUDIT NOTE (Phase 5)
+// ============================================================
+// GROQ_API_KEY is a HIGH-RISK credential. The EXPO_PUBLIC_ prefix
+// embeds it into the JS bundle where it can be extracted via
+// reverse engineering (e.g., `strings app.bundle.js | grep gsk_`).
+//
+// CURRENT MITIGATION: SecureStore takes priority over .env.
+// PRODUCTION RECOMMENDATION: Route Groq calls through a
+// Supabase Edge Function so the bearer token never ships to clients.
+//   Example: POST /functions/v1/groq-proxy
+// ============================================================
+
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 export interface ChatMessage {
@@ -55,7 +68,8 @@ export const getHardwareRecommendation = async (userContext: string, retrievedCo
   Technical Context:
   ${retrievedContext}
   
-  Provide a concise, technical recommendation based on the user's specific solar site conditions.`;
+  Provide a concise, technical recommendation based on the user's specific solar site conditions. 
+  Use Philippine Pesos (₱) for all currency and cost-related data.`;
 
   return await queryGroq([
     { role: 'system', content: systemPrompt },

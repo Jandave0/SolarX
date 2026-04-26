@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
-import Animated, { 
-  useAnimatedStyle, 
-  useSharedValue, 
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
   withSpring,
   interpolate,
+  interpolateColor,
   Extrapolate
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
@@ -14,45 +15,96 @@ import { GlassPanel } from '@/components/ui/GlassPanel';
 import { EnergyChip } from '@/components/ui/EnergyChip';
 import { useTiltSensor } from '@/hooks/useTiltSensor';
 
-const TARGET_TILT = 35;
-const TARGET_AZIMUTH = 180;
-const TOLERANCE = 5;
+const OPTIMAL_TILT_PH = 15; // Optimal tilt for Philippines (Latitude 14.6)
+const TARGET_AZIMUTH = 180; // Facing South
+const TOLERANCE = 4;
+
+import { useSQLiteContext } from '@/src/services/database';
 
 export default function OptimizerScreen() {
   const { tilt, roll, azimuth } = useTiltSensor(50);
-  
+
   // Shared values for animation
   const animatedTilt = useSharedValue(0);
   const animatedRoll = useSharedValue(0);
   const animatedAzimuth = useSharedValue(0);
+  const glowOpacity = useSharedValue(0);
+  const db = useSQLiteContext();
+  const [targetTilt, setTargetTilt] = React.useState(OPTIMAL_TILT_PH);
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  useEffect(() => {
+    // Check if we have a saved calibration in the DB
+    const checkSaved = async () => {
+      try {
+        const saved: any = await db.getFirstAsync('SELECT * FROM panel_configs LIMIT 1');
+        if (saved) {
+          setTargetTilt(saved.target_tilt);
+        }
+      } catch (e) {
+        console.log('No saved config');
+      }
+    };
+    checkSaved();
+  }, [db]);
 
   useEffect(() => {
     animatedTilt.value = withSpring(tilt);
     animatedRoll.value = withSpring(roll);
     animatedAzimuth.value = withSpring(azimuth);
 
-    // Haptic feedback when near target
-    const isAligned = 
-      Math.abs(tilt - TARGET_TILT) < TOLERANCE && 
+    // Haptic feedback and glow when near target
+    const isAlignedNow =
+      Math.abs(tilt - targetTilt) < TOLERANCE &&
+      Math.abs(roll) < 2 &&
       Math.abs(azimuth - TARGET_AZIMUTH) < TOLERANCE;
-    
-    if (isAligned) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    if (isAlignedNow) {
+      if (glowOpacity.value === 0) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      glowOpacity.value = withSpring(1);
+    } else {
+      glowOpacity.value = withSpring(0);
     }
-  }, [tilt, roll, azimuth]);
+  }, [tilt, roll, azimuth, targetTilt]);
 
   const bubbleStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        { translateX: interpolate(animatedRoll.value, [-45, 45], [-80, 80], Extrapolate.CLAMP) },
-        { translateY: interpolate(animatedTilt.value, [-45, 45], [80, -80], Extrapolate.CLAMP) },
+        { translateX: interpolate(animatedRoll.value, [-30, 30], [-100, 100], Extrapolate.CLAMP) },
+        { translateY: interpolate(animatedTilt.value - targetTilt, [-30, 30], [100, -100], Extrapolate.CLAMP) },
       ],
+      backgroundColor: interpolateColor(glowOpacity.value, [0, 1], ['#FFB703', '#FFD60A']), 
     };
   });
 
-  const isAligned = 
-    Math.abs(tilt - TARGET_TILT) < TOLERANCE && 
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: glowOpacity.value,
+    transform: [{ scale: interpolate(glowOpacity.value, [0, 1], [0.8, 1.2]) }],
+  }));
+
+  const isAligned =
+    Math.abs(tilt - targetTilt) < TOLERANCE &&
+    Math.abs(roll) < 2 &&
     Math.abs(azimuth - TARGET_AZIMUTH) < TOLERANCE;
+
+  const handleSaveCalibration = async () => {
+    setIsSaving(true);
+    try {
+      await db.runAsync('DELETE FROM panel_configs'); // Keep only one config for now
+      await db.runAsync(
+        'INSERT INTO panel_configs (target_tilt, target_azimuth, date) VALUES (?, ?, ?)',
+        [tilt, azimuth, new Date().toISOString()]
+      );
+      setTargetTilt(tilt);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 20 }}>
@@ -66,26 +118,41 @@ export default function OptimizerScreen() {
 
         {/* Real-time Level Indicator */}
         <GlassPanel className="h-80 items-center justify-center overflow-hidden">
-          {/* Target Reticle */}
-          <View 
+          {/* Alignment Glow */}
+          <Animated.View
             style={[
-              styles.targetReticle, 
-              { borderColor: isAligned ? '#FFB703' : 'rgba(255,255,255,0.1)' }
-            ]} 
+              {
+                position: 'absolute',
+                width: 120,
+                height: 120,
+                borderRadius: 60,
+                backgroundColor: '#FFB703',
+                opacity: 0.2,
+              },
+              glowStyle
+            ]}
           />
-          
+
+          {/* Target Reticle */}
+          <View
+            style={[
+              styles.targetReticle,
+              { borderColor: isAligned ? '#FFB703' : 'rgba(255,255,255,0.2)' }
+            ]}
+          />
+
           {/* Moving Bubble */}
-          <Animated.View style={[styles.bubble, bubbleStyle]}>
-            <View className="w-full h-full rounded-full bg-primary opacity-80" />
+          <Animated.View style={[styles.bubble, bubbleStyle] as any}>
+            <View className="w-full h-full rounded-full bg-primary" />
             <View className="absolute w-4 h-4 rounded-full bg-white opacity-40 top-2 left-2" />
           </Animated.View>
 
           {/* Compass Ring */}
           <View className="absolute bottom-4 flex-row gap-4">
-             <EnergyChip 
-              label={`${azimuth}°`} 
-              icon="compass-outline" 
-              status={Math.abs(azimuth - TARGET_AZIMUTH) < TOLERANCE ? 'success' : 'warning'} 
+            <EnergyChip
+              label={`${azimuth}°`}
+              icon="compass-outline"
+              status={Math.abs(azimuth - TARGET_AZIMUTH) < TOLERANCE ? 'Gold' : 'Blue'}
             />
           </View>
         </GlassPanel>
@@ -95,27 +162,42 @@ export default function OptimizerScreen() {
           <Card className="flex-1 p-4 gap-2">
             <Typography variant="label" className="text-text-muted">CURRENT TILT</Typography>
             <Typography variant="h2">{tilt}°</Typography>
-            <Typography variant="caption" className="text-primary">Target: {TARGET_TILT}°</Typography>
+            <Typography variant="caption" className="text-primary-container">Target: {targetTilt}°</Typography>
           </Card>
           <Card className="flex-1 p-4 gap-2">
             <Typography variant="label" className="text-text-muted">ROLL (LEVEL)</Typography>
             <Typography variant="h2">{roll}°</Typography>
-            <Typography variant="caption" className={Math.abs(roll) < 2 ? 'text-success' : 'text-text-muted'}>
-              {Math.abs(roll) < 2 ? 'Level' : 'Adjust'}
+            <Typography variant="caption" className={Math.abs(roll) < 2 ? 'text-primary-container' : 'text-text-muted'}>
+              {Math.abs(roll) < 2 ? 'CENTERED' : 'ADJUST ROLL'}
             </Typography>
           </Card>
         </View>
 
-        <Card className="p-5 gap-4">
+        <Card className="p-5 gap-4 bg-primary/5 border-primary/20">
           <View className="flex-row items-center justify-between">
-            <Typography variant="h3">Alignment Guide</Typography>
-            <View className={`w-3 h-3 rounded-full ${isAligned ? 'bg-success' : 'bg-warning'}`} />
+            <View className="gap-1">
+              <Typography variant="h3">Optimal Harvest</Typography>
+              <Typography variant="caption" className="text-text-muted">Target: {targetTilt}° Tilt • 180° South</Typography>
+            </View>
+            <View className={`w-4 h-4 rounded-full ${isAligned ? 'bg-primary' : 'bg-white/10'}`} />
           </View>
-          <Typography variant="body" className="text-text-muted">
-            {isAligned 
-              ? "Perfect! Your device is aligned with the optimal solar harvesting angle."
-              : "Tilt your device until the golden bubble stays within the center ring."}
+
+          <Typography variant="body" className="text-text-muted leading-6">
+            {isAligned
+              ? "Position maintained. Your panel is now in the high-yield sweet spot for Manila's latitude."
+              : "Place your phone flat against your panel. Aim for the center circle to maximize irradiance."}
           </Typography>
+
+          <View className="flex-row gap-3 pt-2">
+            <Card
+              className="flex-1 p-3 items-center bg-primary active:opacity-80"
+              onPress={handleSaveCalibration}
+            >
+              <Typography variant="body" className="text-background font-bold">
+                {isSaving ? "SAVING..." : "SAVE CALIBRATION"}
+              </Typography>
+            </Card>
+          </View>
         </Card>
       </View>
     </ScrollView>

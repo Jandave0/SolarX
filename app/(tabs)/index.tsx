@@ -1,36 +1,78 @@
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { Typography } from '@/components/ui/Typography';
 import { Card } from '@/components/ui/Card';
 import { EnergyChip } from '@/components/ui/EnergyChip';
 import { GlassPanel } from '@/components/ui/GlassPanel';
+import { CircularGauge } from '@/components/ui/CircularGauge';
 import { EnergyFlowChart } from '@/src/components/charts/EnergyFlowChart';
+import { Button } from '@/components/ui/Button';
+import { router } from 'expo-router';
+import { AssessmentHistory } from '@/components/AssessmentHistory';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { useSQLiteContext, AssessmentRecord } from '@/src/services/database';
+import React, { useEffect, useState } from 'react';
 
 export default function DashboardScreen() {
+  const [latestAssessment, setLatestAssessment] = useState<AssessmentRecord | null>(null);
+
+  const db = useSQLiteContext();
+
+  useEffect(() => {
+    const loadLatest = async () => {
+      try {
+        const latest = await db.getFirstAsync<AssessmentRecord>('SELECT * FROM assessments ORDER BY date DESC LIMIT 1');
+        setLatestAssessment(latest);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    loadLatest();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 20 }}>
       <View className="gap-6 pb-10">
         <View className="flex-row justify-between items-end">
           <View>
-            <Typography variant="h1">SolarX Live</Typography>
+            <View className="flex-row items-center gap-3">
+              <Typography variant="h1">SolarX Live</Typography>
+              <TouchableOpacity onPress={() => router.push('/settings' as any)} className="bg-surface-container/50 p-2 rounded-full border border-white/5">
+                <MaterialCommunityIcons name="cog" size={20} color="#FFB703" />
+              </TouchableOpacity>
+            </View>
             <Typography variant="body" className="text-text-muted">
               Monitoring your energy ecosystem.
             </Typography>
           </View>
-          <View className="bg-success/20 px-3 py-1 rounded-full border border-success/30">
-            <Typography variant="caption" className="text-success">System Online</Typography>
-          </View>
+          <EnergyChip label="SYSTEM LIVE" status="Gold" />
+        </View>
+
+        {/* Solar Pulse Gauge Section */}
+        <View className="items-center py-4">
+          <CircularGauge 
+            percentage={68} 
+            label="6.4" 
+            subLabel="kW PRODUCED" 
+            color="#FFB703" 
+            size={220}
+            strokeWidth={16}
+          />
         </View>
 
         {/* Current Status Row */}
         <View className="flex-row gap-3">
-          <EnergyChip label="6.4 kW" icon="sun-wireless" status="success" />
-          <EnergyChip label="2.1 kW" icon="home-lightning-bolt" status="warning" />
-          <EnergyChip label="88%" icon="battery-80" status="success" />
+          <EnergyChip label="6.4 kW" icon="sun-wireless" status="Gold" />
+          <EnergyChip label="2.1 kW" icon="home-lightning-bolt" status="Blue" />
+          <EnergyChip label="88%" icon="battery-80" status="Blue" />
         </View>
 
         {/* Main Production Chart */}
         <GlassPanel className="p-4 pt-6">
-          <Typography variant="h3" className="mb-4 ml-2">Energy Flow (24h)</Typography>
+          <View className="flex-row items-center justify-between mb-4 px-2">
+            <Typography variant="h3">Energy Flow</Typography>
+            <Typography variant="caption" className="text-text-muted">LIVE (24H)</Typography>
+          </View>
           <EnergyFlowChart />
         </GlassPanel>
 
@@ -38,24 +80,45 @@ export default function DashboardScreen() {
         <View className="flex-row gap-4">
           <Card className="flex-1 p-5 gap-2">
             <Typography variant="label" className="text-text-muted">TODAY'S HARVEST</Typography>
-            <Typography variant="h2">32.4</Typography>
-            <Typography variant="caption" className="text-success">+12% vs yesterday</Typography>
+            <View className="flex-row items-baseline gap-1">
+              <Typography variant="h2">32.4</Typography>
+              <Typography variant="caption" className="text-text-muted font-bold">kWh</Typography>
+            </View>
+            <Typography variant="caption" className="text-primary-container">+12% vs yesterday</Typography>
           </Card>
           <Card className="flex-1 p-5 gap-2">
             <Typography variant="label" className="text-text-muted">GRID SAVINGS</Typography>
-            <Typography variant="h2">$4.12</Typography>
-            <Typography variant="caption" className="text-primary">Monthly: $84.50</Typography>
+            <Typography variant="h2">₱284.12</Typography>
+            <Typography variant="caption" className="text-secondary-container">Monthly: ₱8,450.50</Typography>
           </Card>
         </View>
 
+        <AssessmentHistory />
+
         {/* AI Insight Card */}
-        <Card className="p-5 border-l-4 border-primary">
-          <View className="flex-row items-center gap-2 mb-2">
-            <Typography variant="h3" className="text-primary">AI Recommendation</Typography>
+        <Card className="p-6 border-l-4 border-primary-container bg-primary-container/5 gap-4">
+          <View className="flex-row items-center gap-3">
+            <View className="bg-primary-container/20 p-2 rounded-lg">
+              <MaterialCommunityIcons name="brain" size={24} color="#FFB703" />
+            </View>
+            <Typography variant="h3" className="text-primary-container">
+              {latestAssessment ? "Smart Recommendation" : "Action Required"}
+            </Typography>
           </View>
-          <Typography variant="body" className="text-text-muted leading-6">
-            Peak production is expected at 1:30 PM. We recommend scheduling heavy loads (like washing machines) during this window to maximize your grid independence.
+          
+          <Typography variant="body" className="text-on-surface-variant leading-6">
+            {latestAssessment 
+              ? latestAssessment.recommendation
+              : "Peak production is expected soon. Run a full site assessment to optimize your hardware configuration for maximum grid independence."}
           </Typography>
+
+          <Button 
+            variant={latestAssessment ? "outline" : "solid"}
+            onPress={() => router.push('/assessment' as any)}
+            className="mt-2"
+          >
+            {latestAssessment ? "RUN NEW ASSESSMENT" : "START ASSESSMENT"}
+          </Button>
         </Card>
       </View>
     </ScrollView>

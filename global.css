@@ -30,19 +30,16 @@
     --color-surface-tint: #ffba27;
     --color-primary: #ffdba0;
     --color-on-primary: #422c00;
-    --color-primary-container: #ffb703;
-    /* Solar Gold */
+    --color-primary-container: #ffb703; /* Solar Gold */
     --color-on-primary-container: #6b4b00;
     --color-inverse-primary: #7d5800;
     --color-secondary: #bdf4ff;
     --color-on-secondary: #00363d;
-    --color-secondary-container: #00e5ff;
-    /* Electric Blue */
+    --color-secondary-container: #00e3fd; /* Electric Blue */
     --color-on-secondary-container: #00616d;
     --color-tertiary: #ffd6d9;
     --color-on-tertiary: #67001e;
-    --color-tertiary-container: #ff4d6d;
-    /* Neon Rose */
+    --color-tertiary-container: #ff4d6d; /* Neon Rose */
     --color-on-tertiary-container: #a40034;
     --color-error: #ffb4ab;
     --color-on-error: #690005;
@@ -52,13 +49,13 @@
     --color-on-success: #1a3700;
     --color-warning: #ffba27;
     --color-on-warning: #422c00;
-    --color-background: #16161A;
-    /* Deep Matte Night */
+    --color-background: #131317; /* Deep Matte Night */
     --color-on-background: #e4e1e7;
     --color-surface-variant: #353439;
 
     /* Custom Border and Drop Shadows */
     --color-border-glow: rgba(255, 255, 255, 0.05);
+    --shadow-solar: 0 0 24px rgba(255, 183, 3, 0.15);
   }
 }
 
