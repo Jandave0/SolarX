@@ -81,18 +81,12 @@ SolarX/
 │       ├── hardware.tsx     # Hardware inventory & AI diagnostics
 │       ├── weather.tsx      # Weather & harvest forecast
 │       └── optimizer.tsx    # Smart Tilt Optimizer
-├── components/
-│   ├── AssessmentHistory.tsx
-│   └── ui/
-│       ├── Button.tsx
-│       ├── Card.tsx
-│       ├── CircularGauge.tsx
-│       ├── EnergyChip.tsx
-│       ├── GlassPanel.tsx
-│       └── Typography.tsx
 ├── src/
-│   ├── components/charts/
-│   │   └── EnergyFlowChart.tsx
+│   ├── components/          # UI Components & Feature Modules
+│   │   ├── charts/
+│   │   │   └── EnergyFlowChart.tsx
+│   │   └── ui/              # Atom-level UI (Button, Card, etc.)
+│   ├── hooks/               # Core sensors & simulation logic
 │   ├── lib/
 │   │   ├── groq.ts          # Groq API client (RAG prompt builder)
 │   │   └── supabase.ts      # Supabase client (SecureStore-first auth)
@@ -102,9 +96,6 @@ SolarX/
 │   │   └── weatherService.ts   # Weather data fetching
 │   └── store/
 │       └── assessmentStore.ts  # Zustand store for assessment wizard state
-├── hooks/
-│   ├── useTiltSensor.ts     # Accelerometer + Magnetometer hook
-│   └── use-color-scheme.ts
 └── global.css               # NativeWind / Tailwind base styles
 ```
 
