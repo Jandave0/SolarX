@@ -81,7 +81,7 @@ export default function DashboardScreen() {
         {/* Quick Stats Grid */}
         <View className="flex-row gap-4">
           <Card className="flex-1 p-5 gap-2">
-            <Typography variant="label" className="text-text-muted">TODAY'S HARVEST</Typography>
+            <Typography variant="label" className="text-text-muted">TODAY&apos;S HARVEST</Typography>
             <View className="flex-row items-baseline gap-1">
               <Typography variant="h2">{liveData.dailyHarvest}</Typography>
               <Typography variant="caption" className="text-text-muted font-bold">kWh</Typography>

@@ -132,7 +132,7 @@ export default function HardwareScreen() {
           {recommendation ? (
             <View className="bg-surface-container/50 p-5 rounded-2xl border border-white/5">
               <Typography variant="body" className="leading-relaxed text-on-surface-variant italic">
-                "{recommendation}"
+                &ldquo;{recommendation}&rdquo;
               </Typography>
               <TouchableOpacity className="mt-5" onPress={() => setRecommendation(null)}>
                 <Typography variant="label-caps" className="text-primary-container font-bold">RESET ANALYSIS</Typography>

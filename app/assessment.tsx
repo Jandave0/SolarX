@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { router } from 'expo-router';
 import { saveAssessment, useSQLiteContext } from '@/src/services/database';
 
+import { ApplianceSelector } from '@/src/components/ApplianceSelector';
 import Markdown from 'react-native-markdown-display';
 
 export default function AssessmentScreen() {
@@ -16,12 +17,14 @@ export default function AssessmentScreen() {
     currentStep,
     location,
     energyUsage,
+    selectedAppliances,
     isCalculating,
     setStep,
     nextStep,
     prevStep,
     setLocation,
     setEnergyUsage,
+    toggleAppliance,
     setIsCalculating,
     resetAssessment
   } = useAssessmentStore();
@@ -32,14 +35,23 @@ export default function AssessmentScreen() {
 
   const handleCalculate = async () => {
     setIsCalculating(true);
-    nextStep(); // Move to result step
+    nextStep(); // Move to result step (Step 4)
 
     try {
+      // Format appliances for the prompt
+      const applianceList = selectedAppliances.length > 0 
+        ? selectedAppliances.map(a => `- ${a.name} (${a.powerWatts}W, ${a.avgHoursPerDay} hrs/day)`).join('\n')
+        : 'No specific appliances selected.';
+
       // User Context for RAG
       const userContext = `The user is located at ${location.address}. 
       Their average monthly electricity bill is ₱${energyUsage.monthlyBill} 
       and they consume ${energyUsage.kwhPerMonth} kWh per month. 
-      Recommend a tailored solar energy system including panel capacity, inverter type, and storage recommendations.`;
+      
+      APPLIANCE LOAD PROFILE:
+      ${applianceList}
+      
+      Recommend a tailored solar energy system including panel capacity, inverter type, and storage recommendations based on this specific load profile and monthly consumption.`;
 
       // Technical Context (Reference data for the AI)
       const retrievedContext = `
@@ -60,7 +72,7 @@ export default function AssessmentScreen() {
         date: new Date().toISOString(),
         location: location.address,
         avg_usage: energyUsage.kwhPerMonth,
-        roof_area: 0, // Could be added to UI later
+        roof_area: 0, 
         recommendation: result
       });
     } catch (error) {
@@ -118,7 +130,7 @@ export default function AssessmentScreen() {
                 <Typography variant="label" className="mb-3 text-primary-container">Monthly Bill (₱)</Typography>
                 <TextInput
                   className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg font-['Plus Jakarta Sans']"
-                  placeholder="e.g. 180"
+                  placeholder="e.g. 8500"
                   placeholderTextColor="rgba(255,255,255,0.2)"
                   keyboardType="numeric"
                   value={energyUsage.monthlyBill ? energyUsage.monthlyBill.toString() : ''}
@@ -149,8 +161,38 @@ export default function AssessmentScreen() {
               </Button>
               <Button
                 className="flex-[2] h-16"
-                onPress={handleCalculate}
+                onPress={nextStep}
                 disabled={!energyUsage.monthlyBill || !energyUsage.kwhPerMonth}
+              >
+                Next: Appliance Load
+              </Button>
+            </View>
+          </View>
+        );
+
+      case 3:
+        return (
+          <View className="gap-6 animate-in fade-in duration-500">
+             <View>
+              <Typography variant="h2">Appliance Load</Typography>
+              <Typography variant="body" className="text-text-muted mt-1">
+                Select common appliances to refine your load profile.
+              </Typography>
+            </View>
+
+            <ApplianceSelector />
+
+            <View className="flex-row gap-4">
+              <Button
+                variant="secondary"
+                className="flex-1 h-16"
+                onPress={prevStep}
+              >
+                Back
+              </Button>
+              <Button
+                className="flex-[2] h-16"
+                onPress={handleCalculate}
               >
                 Generate AI Analysis
               </Button>
@@ -158,7 +200,7 @@ export default function AssessmentScreen() {
           </View>
         );
 
-      case 3:
+      case 4:
         return (
           <View className="gap-6 animate-in fade-in duration-700">
             <View>
@@ -172,7 +214,7 @@ export default function AssessmentScreen() {
               {isCalculating ? (
                 <View className="flex-1 items-center justify-center gap-6 py-12">
                   <ActivityIndicator size="large" color="#FFB703" />
-                  <Typography className="text-center text-primary-container font-bold px-4">
+                  <Typography className="text-center text-primary-container font-bold px-4 tracking-tighter">
                     SOLARX AI IS CALCULATING YOUR OPTIMAL HARDWARE MIX...
                   </Typography>
                 </View>
@@ -238,10 +280,10 @@ export default function AssessmentScreen() {
       >
         <View className="mb-12 flex-row items-center justify-between">
           <View className="flex-row gap-2.5">
-            {[1, 2, 3].map((step) => (
+            {[1, 2, 3, 4].map((step) => (
               <View
                 key={step}
-                className={`h-2 w-14 rounded-full ${step <= currentStep ? 'bg-primary-container shadow-[0_0_8px_#FFB703]' : 'bg-white/10'
+                className={`h-2 w-10 rounded-full ${step <= currentStep ? 'bg-primary-container shadow-[0_0_8px_#FFB703]' : 'bg-white/10'
                   }`}
               />
             ))}

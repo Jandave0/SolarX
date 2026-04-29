@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Appliance } from '../data/appliancePresets';
 
 // Define the types for our assessment data
 export interface LocationData {
@@ -18,6 +19,7 @@ export interface AssessmentState {
   currentStep: number;
   location: LocationData;
   energyUsage: EnergyUsageData;
+  selectedAppliances: Appliance[];
   isCalculating: boolean;
   
   // Actions
@@ -26,6 +28,8 @@ export interface AssessmentState {
   prevStep: () => void;
   setLocation: (location: Partial<LocationData>) => void;
   setEnergyUsage: (usage: Partial<EnergyUsageData>) => void;
+  setSelectedAppliances: (appliances: Appliance[]) => void;
+  toggleAppliance: (appliance: Appliance) => void;
   setIsCalculating: (isCalculating: boolean) => void;
   resetAssessment: () => void;
 }
@@ -42,6 +46,7 @@ const initialState = {
     monthlyBill: 0,
     kwhPerMonth: 0,
   },
+  selectedAppliances: [],
   isCalculating: false,
 };
 
@@ -64,6 +69,21 @@ export const useAssessmentStore = create<AssessmentState>()((set) => ({
     set((state) => ({ 
       energyUsage: { ...state.energyUsage, ...usageUpdate } 
     })),
+
+  setSelectedAppliances: (appliances) => set({ selectedAppliances: appliances }),
+
+  toggleAppliance: (appliance) => 
+    set((state) => {
+      const exists = state.selectedAppliances.some((a) => a.id === appliance.id);
+      if (exists) {
+        return { 
+          selectedAppliances: state.selectedAppliances.filter((a) => a.id !== appliance.id) 
+        };
+      }
+      return { 
+        selectedAppliances: [...state.selectedAppliances, appliance] 
+      };
+    }),
 
   setIsCalculating: (isCalculating) => set({ isCalculating }),
 

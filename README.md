@@ -174,12 +174,18 @@ The `assessments` and `panel_configs` tables are created automatically by the SQ
 - [x] Assessment history persistence and dashboard surfacing
 - [x] Security audit (API key handling, `.gitignore`, SecureStore pattern)
 
-### 🔜 Next Sprint
-- [ ] **Appliance-Aware AI Assessment** — Step 3 appliance picker (AC, fridge, etc.) feeds real load profile into the RAG prompt for accurate system sizing
-- [ ] **Export Data** — Export assessment history to JSON/CSV; shareable PDF report for installers via `expo-sharing`
-- [ ] **Import Data** — Restore backup JSON or import monthly kWh from a CSV
-- [ ] **Settings Screen** — Wire up the dead `/settings` route with Export/Import controls
-- [ ] **Real Irradiance API** — Replace mock weather data with Open-Meteo solar radiation endpoint (free)
+### ✅ Completed (Recent Sprint)
+- [x] **Appliance-Aware AI Assessment** 
+  - **Google Jules**: Designed `ApplianceSelector` UI with animated chips and frosted glass.
+  - **Antigravity**: Created `/src/data/appliancePresets.ts` and updated `assessmentStore.ts` & `groq.ts` to feed the load profile into the RAG prompt.
+- [x] **Data Portability (Import/Export)** 
+  - **Antigravity**: Implemented export to JSON/CSV and shareable PDF reports via `expo-sharing`. Implemented logic to restore from backup JSON or import monthly kWh CSV.
+- [x] **Settings Screen Integration** 
+  - **Google Jules**: Wired up the `/settings` route to host the Import/Export UI with premium Solar Neo-Material styling.
+- [x] **Real Irradiance API** 
+  - **Antigravity**: Replaced mock weather data with Open-Meteo solar radiation endpoint.
+- [x] **QA Audit**
+  - **Gemini CLI**: Performed a full design system and logic compliance check on all new components.
 
 ### 🔮 Future Backlog
 - [ ] Supabase Auth — Email/Google login for cross-device sync
