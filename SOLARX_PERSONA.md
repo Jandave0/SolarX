@@ -99,11 +99,10 @@ UI TASKS:
 | **🧠 Antigravity** | **Global UI Refactor** | ✅ DONE | Migrated all `StyleSheet` to NativeWind v5 / Tailwind v4. |
 | **🧠 Antigravity** | **Energy Simulation** | ✅ DONE | Built `useEnergySimulation` hook for real-time dashboard data. |
 | **🧠 Antigravity** | **Markdown Integration** | ✅ DONE | Added `react-native-markdown-display` for bold AI results. |
-| **🎨 Google Jules** | **Appliance Selector UI** | ✅ DONE | Built the `ApplianceSelector` component with animated chips. |
+| **🎨 Google Jules** | **Appliance Selector UI** | 🏗️ IN PROGRESS | Build the `ApplianceSelector` component with animated chips. |
 | **🎨 Google Jules** | **Energy Flow Logic** | ✅ DONE | Connected `EnergyFlowChart` to live simulation data. |
-| **🧠 Antigravity** | **Data Portability** | ✅ DONE | Implemented JSON/CSV Export and PDF Reporting. |
 | **🧠 Antigravity** | **Currency Localization** | ✅ DONE | Standardized all costs and calculations to PHP (₱). |
-| **🔍 Gemini CLI** | **QA Audit** | ✅ DONE | Verified design system compliance of all new features. |
+| **🔍 Gemini CLI** | **QA Audit** | 🔍 PENDING | Verify design system compliance of new components. |
 
 ## 🏆 Completed Milestones
 - [x] **Production-Ready UI**: Removed all legacy React Native styles; 100% Tailwind coverage.
