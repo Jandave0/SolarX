@@ -20,12 +20,18 @@ export interface ChatMessage {
   content: string;
 }
 
+let _cachedApiKey: string | null = null;
+
 export const queryGroq = async (messages: ChatMessage[], model = 'llama-3.3-70b-versatile') => {
   // Use the secure store key if available, otherwise fallback to .env for dev
-  let apiKey = await getSecureItem('GROQ_API_KEY');
-  if (!apiKey) {
-    apiKey = process.env.EXPO_PUBLIC_GROQ_API_KEY || '';
+  if (!_cachedApiKey) {
+    _cachedApiKey = await getSecureItem('GROQ_API_KEY');
+    if (!_cachedApiKey) {
+      _cachedApiKey = process.env.EXPO_PUBLIC_GROQ_API_KEY || '';
+    }
   }
+
+  const apiKey = _cachedApiKey;
 
   if (!apiKey) {
     throw new Error('Groq API Key not found. Please set EXPO_PUBLIC_GROQ_API_KEY in .env or SecureStore.');

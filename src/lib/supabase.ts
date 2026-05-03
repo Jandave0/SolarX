@@ -29,8 +29,10 @@ let _client: SupabaseClient | null = null;
 export const getSupabaseClient = async (): Promise<SupabaseClient> => {
   if (_client) return _client;
 
-  const secureUrl = await getSecureItem('SUPABASE_URL');
-  const secureKey = await getSecureItem('SUPABASE_ANON_KEY');
+  const [secureUrl, secureKey] = await Promise.all([
+    getSecureItem('SUPABASE_URL'),
+    getSecureItem('SUPABASE_ANON_KEY'),
+  ]);
 
   const url = secureUrl || process.env.EXPO_PUBLIC_SUPABASE_URL!;
   const key = secureKey || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
