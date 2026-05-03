@@ -75,7 +75,7 @@ export default function SettingsScreen() {
         <View className="gap-6">
           <Typography variant="h3">API Configuration</Typography>
           <Typography variant="body" className="text-text-muted">
-            Customize your service connections. These keys are stored locally in the device's secure enclave and take priority over environment defaults.
+            Customize your service connections. These keys are stored locally in the device&apos;s secure enclave and take priority over environment defaults.
           </Typography>
 
           <GlassPanel className="p-5 gap-6">

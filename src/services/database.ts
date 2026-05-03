@@ -1,5 +1,13 @@
 import * as SQLite from 'expo-sqlite';
 
+
+export interface PanelConfigRecord {
+  id: number;
+  target_tilt: number;
+  target_azimuth: number;
+  date: string;
+}
+
 export interface AssessmentRecord {
   id: number;
   date: string;

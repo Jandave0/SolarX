@@ -1,3 +1,4 @@
+import { useSQLiteContext, PanelConfigRecord } from '@/src/services/database';
 import React, { useEffect } from 'react';
 import { View, ScrollView } from 'react-native';
 import Animated, {
@@ -19,8 +20,6 @@ const OPTIMAL_TILT_PH = 15; // Optimal tilt for Philippines (Latitude 14.6)
 const TARGET_AZIMUTH = 180; // Facing South
 const TOLERANCE = 4;
 
-import { useSQLiteContext } from '@/src/services/database';
-
 export default function OptimizerScreen() {
   const { tilt, roll, azimuth } = useTiltSensor(50);
 
@@ -37,7 +36,7 @@ export default function OptimizerScreen() {
     // Check if we have a saved calibration in the DB
     const checkSaved = async () => {
       try {
-        const saved: any = await db.getFirstAsync('SELECT * FROM panel_configs LIMIT 1');
+        const saved = await db.getFirstAsync<PanelConfigRecord>('SELECT * FROM panel_configs LIMIT 1');
         if (saved) {
           setTargetTilt(saved.target_tilt);
         }
@@ -139,7 +138,7 @@ export default function OptimizerScreen() {
           {/* Moving Bubble */}
           <Animated.View 
             className="w-[40px] h-[40px] rounded-full shadow-[0_0_10px_#FFB703] elevation-5" 
-            style={[bubbleStyle] as any}
+            style={[bubbleStyle]}
           >
             <View className="w-full h-full rounded-full bg-primary" />
             <View className="absolute w-4 h-4 rounded-full bg-white opacity-40 top-2 left-2" />
