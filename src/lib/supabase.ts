@@ -15,8 +15,9 @@ import { getSecureItem } from '../utils/storage';
 //   - GROQ_API_KEY          → HIGH (Direct bearer token - see groq.ts)
 //
 // MITIGATION:
-//   1. The Settings screen lets users replace .env keys with SecureStore keys.
-//   2. For production: proxy GROQ requests through a Supabase Edge Function
+//   1. The EXPO_PUBLIC_ fallback for GROQ_API_KEY has been removed for security.
+//   2. The Settings screen lets users set SecureStore keys.
+//   3. For production: proxy GROQ requests through a Supabase Edge Function
 //      so the GROQ key never ships in the client bundle.
 // ============================================================
 

@@ -132,14 +132,11 @@ npx expo start
 Create a `.env` file in the project root:
 
 ```env
-EXPO_PUBLIC_GROQ_API_KEY=your_groq_api_key_here
 EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 ```
 
-> **Security Note:** API keys in `.env` are bundled into the JS bundle in development.
-> For production, proxy all Groq requests through a Supabase Edge Function and remove
-> the key from client-side environment variables.
+> **Security Note:** The Groq API Key is not included in environment variables to prevent it from being bundled with the application. Instead, it should be configured securely via the in-app Settings screen (stored in device SecureStore). For production, it is recommended to proxy all Groq requests through a Supabase Edge Function.
 
 ### Supabase Schema
 
