@@ -1,4 +1,5 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface WeatherData {
   current: {
@@ -6,12 +7,12 @@ export interface WeatherData {
     condition: string;
     irradiance: number;
   };
-  forecast: Array<{
+  forecast: {
     day: string;
     temp: number;
     condition: string;
     irradiance: number;
-  }>;
+  }[];
 }
 
 const CONDITION_MAP: Record<number, string> = {
@@ -28,7 +29,38 @@ const CONDITION_MAP: Record<number, string> = {
   95: 'Thunderstorm',
 };
 
+const CACHE_KEY_PREFIX = 'weather_data_';
+const CACHE_EXPIRATION_MS = 60 * 60 * 1000; // 1 hour
+
+// In-memory cache to avoid AsyncStorage overhead for repeated calls in same session
+const memoryCache = new Map<string, { timestamp: number; data: WeatherData }>();
+
 export const fetchWeatherData = async (lat = 14.5995, lon = 120.9842): Promise<WeatherData> => {
+  const cacheKey = `${CACHE_KEY_PREFIX}${lat}_${lon}`;
+  const now = Date.now();
+
+  // 1. Check in-memory cache
+  const memCached = memoryCache.get(cacheKey);
+  if (memCached && now - memCached.timestamp < CACHE_EXPIRATION_MS) {
+    return memCached.data;
+  }
+
+  // 2. Check persistent storage cache
+  try {
+    const stored = await AsyncStorage.getItem(cacheKey);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (now - parsed.timestamp < CACHE_EXPIRATION_MS) {
+        // Hydrate memory cache
+        memoryCache.set(cacheKey, parsed);
+        return parsed.data;
+      }
+    }
+  } catch (err) {
+    console.warn('Weather Cache Read Error:', err);
+  }
+
+  // 3. Fetch from API
   try {
     const response = await axios.get(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,shortwave_radiation&daily=weather_code,temperature_2m_max,shortwave_radiation_sum&timezone=auto`
@@ -48,7 +80,7 @@ export const fetchWeatherData = async (lat = 14.5995, lon = 120.9842): Promise<W
       };
     });
 
-    return {
+    const weatherData: WeatherData = {
       current: {
         temp: Math.round(current.temperature_2m),
         condition: CONDITION_MAP[current.weather_code] || 'Clear',
@@ -56,8 +88,31 @@ export const fetchWeatherData = async (lat = 14.5995, lon = 120.9842): Promise<W
       },
       forecast,
     };
+
+    // Update caches
+    const cacheObject = { timestamp: now, data: weatherData };
+    memoryCache.set(cacheKey, cacheObject);
+
+    AsyncStorage.setItem(cacheKey, JSON.stringify(cacheObject)).catch(err => {
+      console.warn('Weather Cache Write Error:', err);
+    });
+
+    return weatherData;
   } catch (error) {
     console.error('Weather Fetch Error:', error);
+
+    // Fallback: If API fails, try to return stale cache if available
+    try {
+      const stored = await AsyncStorage.getItem(cacheKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        console.warn('Returning stale weather data due to API failure');
+        return parsed.data;
+      }
+    } catch {
+       // Ignore
+    }
+
     throw error;
   }
 };
