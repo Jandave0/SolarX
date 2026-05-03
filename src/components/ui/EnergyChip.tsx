@@ -1,11 +1,12 @@
 import { View, ViewProps } from 'react-native';
+import React from 'react';
 import { Typography } from './Typography';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface EnergyChipProps extends ViewProps {
   status: 'Gold' | 'Blue' | 'Rose';
   label: string;
-  icon?: string; // optional icon name from MaterialCommunityIcons
+  icon?: React.ComponentProps<typeof MaterialCommunityIcons>['name']; // optional icon name from MaterialCommunityIcons
 }
 
 export function EnergyChip({ status, label, icon, className = '', ...props }: EnergyChipProps) {
@@ -29,7 +30,7 @@ export function EnergyChip({ status, label, icon, className = '', ...props }: En
 
   return (
     <View className={`rounded-full px-3 py-1 border flex flex-row items-center gap-1.5 ${bgColors[status]} ${borderColors[status]} ${className}`} {...props}>
-      {icon && <MaterialCommunityIcons name={icon as any} size={14} color={status === 'Gold' ? '#FFB703' : status === 'Blue' ? '#00E5FF' : '#FF4D6D'} />}
+      {icon && <MaterialCommunityIcons name={icon!} size={14} color={status === 'Gold' ? '#FFB703' : status === 'Blue' ? '#00E5FF' : '#FF4D6D'} />}
       <Typography variant="label-caps" className={`${textColors[status]} font-bold`}>
         {label}
       </Typography>

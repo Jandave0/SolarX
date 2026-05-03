@@ -6,7 +6,7 @@ import { GlassPanel } from '@/components/ui/GlassPanel';
 import { CircularGauge } from '@/components/ui/CircularGauge';
 import { EnergyFlowChart } from '@/src/components/charts/EnergyFlowChart';
 import { Button } from '@/components/ui/Button';
-import { router } from 'expo-router';
+import { router, Href } from 'expo-router';
 import { AssessmentHistory } from '@/components/AssessmentHistory';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -39,7 +39,7 @@ export default function DashboardScreen() {
           <View>
             <View className="flex-row items-center gap-3">
               <Typography variant="h1">SolarX Live</Typography>
-              <TouchableOpacity onPress={() => router.push('/settings' as any)} className="bg-surface-container/50 p-2 rounded-full border border-white/5">
+              <TouchableOpacity onPress={() => router.push('/settings' as Href)} className="bg-surface-container/50 p-2 rounded-full border border-white/5">
                 <MaterialCommunityIcons name="cog" size={20} color="#FFB703" />
               </TouchableOpacity>
             </View>
@@ -81,7 +81,7 @@ export default function DashboardScreen() {
         {/* Quick Stats Grid */}
         <View className="flex-row gap-4">
           <Card className="flex-1 p-5 gap-2">
-            <Typography variant="label" className="text-text-muted">TODAY'S HARVEST</Typography>
+            <Typography variant="label" className="text-text-muted">TODAY&apos;S HARVEST</Typography>
             <View className="flex-row items-baseline gap-1">
               <Typography variant="h2">{liveData.dailyHarvest}</Typography>
               <Typography variant="caption" className="text-text-muted font-bold">kWh</Typography>
@@ -116,7 +116,7 @@ export default function DashboardScreen() {
 
           <Button 
             variant={latestAssessment ? "outline" : "solid"}
-            onPress={() => router.push('/assessment' as any)}
+            onPress={() => router.push('/assessment' as Href)}
             className="mt-2"
           >
             {latestAssessment ? "RUN NEW ASSESSMENT" : "START ASSESSMENT"}
