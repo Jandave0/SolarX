@@ -69,16 +69,22 @@ export const fetchWeatherData = async (lat = 14.5995, lon = 120.9842): Promise<W
     const { current, daily } = response.data;
 
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
-    const forecast = daily.time.slice(0, 5).map((time: string, i: number) => {
-      const date = new Date(time);
-      return {
-        day: days[date.getDay()],
-        temp: Math.round(daily.temperature_2m_max[i]),
-        condition: CONDITION_MAP[daily.weather_code[i]] || 'Cloudy',
-        irradiance: Math.round(daily.shortwave_radiation_sum[i] / 3.6), // Convert MJ/m2 to avg W/m2 (rough approx)
-      };
-    });
+    const count = Math.min(daily.time.length, 5);
+    const forecast = new Array(count);
+
+    if (count > 0) {
+      const startDay = new Date(daily.time[0]).getDay();
+      const INV_3_6 = 1 / 3.6;
+
+      for (let i = 0; i < count; i++) {
+        forecast[i] = {
+          day: days[(startDay + i) % 7],
+          temp: Math.round(daily.temperature_2m_max[i]),
+          condition: CONDITION_MAP[daily.weather_code[i]] || 'Cloudy',
+          irradiance: Math.round(daily.shortwave_radiation_sum[i] * INV_3_6),
+        };
+      }
+    }
 
     const weatherData: WeatherData = {
       current: {
