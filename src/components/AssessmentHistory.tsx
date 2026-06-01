@@ -5,7 +5,9 @@ import { Card } from './ui/Card';
 import { getAssessments, AssessmentRecord, useSQLiteContext } from '@/src/services/database';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-export function AssessmentHistory() {
+// ⚡ Bolt Optimization: Wrapped in React.memo() to prevent unnecessary re-renders
+// every second when the parent dashboard component's live timer updates.
+export const AssessmentHistory = React.memo(function AssessmentHistory() {
   const db = useSQLiteContext();
   const [history, setHistory] = useState<AssessmentRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,4 +58,4 @@ export function AssessmentHistory() {
       ))}
     </View>
   );
-}
+});

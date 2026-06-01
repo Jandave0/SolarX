@@ -75,7 +75,7 @@ export default function DashboardScreen() {
             <Typography variant="h3">Energy Flow</Typography>
             <Typography variant="caption" className="text-text-muted">LIVE (24H)</Typography>
           </View>
-          <EnergyFlowChart />
+          <EnergyFlowChart liveData={liveData} />
         </GlassPanel>
 
         {/* Quick Stats Grid */}

@@ -8,7 +8,7 @@ import {
 } from 'victory-native';
 import { Svg, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { Typography } from '@/components/ui/Typography';
-import { useEnergySimulation } from '@/src/hooks/useEnergySimulation';
+import { EnergyData } from '@/src/hooks/useEnergySimulation';
 
 const { width } = Dimensions.get('window');
 
@@ -23,9 +23,13 @@ const BASE_HISTORY = [
   { time: 19, production: 1.2, consumption: 5.8 },
 ];
 
-export const EnergyFlowChart = () => {
-  const liveData = useEnergySimulation();
+interface Props {
+  liveData: EnergyData;
+}
 
+// ⚡ Bolt Optimization: Accept liveData as prop instead of calling useEnergySimulation internally.
+// This prevents duplicate intervals and ensures data synchronization with parent.
+export const EnergyFlowChart = ({ liveData }: Props) => {
   // Combine historical baseline with the current live data point
   const chartData = useMemo(() => {
     const currentHour = liveData.timestamp.getHours();

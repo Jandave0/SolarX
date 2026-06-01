@@ -1,0 +1,3 @@
+## 2026-06-01 - Duplicate Timers & Static Children Re-renders
+**Learning:** Using a custom hook containing a `setInterval` (like `useEnergySimulation`) inside both a parent component and its child causes duplicate background timers. Furthermore, the parent component updating state every second will force re-renders on all its children, even those that only fetch static data on mount (like `AssessmentHistory`).
+**Action:** When a parent needs live simulation data, hoist the state/hook call to the parent and pass the data down as props. For static child components in a rapidly updating parent, wrap them in `React.memo()` to prevent unnecessary re-rendering.
