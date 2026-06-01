@@ -53,14 +53,13 @@ export const queryGroq = async (messages: ChatMessage[], model = 'llama-3.3-70b-
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'Failed to fetch from Groq');
+      throw new Error('Failed to fetch from Groq');
     }
 
     const data = await response.json();
     return data.choices[0].message.content;
   } catch (error) {
-    console.error('Groq Query Error:', error);
+    console.error('Groq Query Error: An unexpected error occurred');
     throw error;
   }
 };
