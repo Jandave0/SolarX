@@ -1,0 +1,4 @@
+## 2026-06-01 - Prevent Sensitive Data Leakage in Error Logs (Updated)
+**Vulnerability:** Raw error objects from external API calls (like fetch or axios) and storage operations could be leaked to the client if thrown directly or improperly logged in user-facing contexts.
+**Learning:** While swallowing all error details by completely removing the `error` object from `console.error` destroys application observability, throwing raw errors to the client can accidentally leak sensitive internal information such as bearer tokens (e.g., GROQ API keys) or stack traces.
+**Prevention:** Follow defense-in-depth for error handling: Log the raw error internally for observability (`console.error('Operation failed:', error);`), but return or throw a sanitized, generic message to the user/client (`throw new Error('An unexpected error occurred.');`) to prevent exposing internal infrastructure details.
