@@ -59,8 +59,8 @@ export const queryGroq = async (messages: ChatMessage[], model = 'llama-3.3-70b-
     const data = await response.json();
     return data.choices[0].message.content;
   } catch (error) {
-    console.error('Groq Query Error: An unexpected error occurred');
-    throw error;
+    console.error('Groq Query Error:', error);
+    throw new Error('An unexpected error occurred while communicating with the AI service.');
   }
 };
 
