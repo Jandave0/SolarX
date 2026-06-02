@@ -12,7 +12,8 @@ interface CircularGaugeProps {
   subLabel?: string;
 }
 
-export function CircularGauge({
+// ⚡ Bolt Optimization: Wrapped in React.memo() to prevent unnecessary re-renders
+export const CircularGauge = React.memo(function CircularGauge({
   size = 180,
   strokeWidth = 12,
   percentage = 0,
@@ -100,4 +101,4 @@ export function CircularGauge({
       </View>
     </View>
   );
-}
+});

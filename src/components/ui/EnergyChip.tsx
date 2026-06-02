@@ -9,7 +9,8 @@ interface EnergyChipProps extends ViewProps {
   icon?: React.ComponentProps<typeof MaterialCommunityIcons>['name']; // optional icon name from MaterialCommunityIcons
 }
 
-export function EnergyChip({ status, label, icon, className = '', ...props }: EnergyChipProps) {
+// ⚡ Bolt Optimization: Wrapped in React.memo() to prevent unnecessary re-renders
+export const EnergyChip = React.memo(function EnergyChip({ status, label, icon, className = '', ...props }: EnergyChipProps) {
   const bgColors = {
     Gold: 'bg-primary-container/15',
     Blue: 'bg-secondary-container/15',
@@ -36,4 +37,4 @@ export function EnergyChip({ status, label, icon, className = '', ...props }: En
       </Typography>
     </View>
   );
-}
+});
