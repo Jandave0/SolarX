@@ -39,7 +39,12 @@ export default function DashboardScreen() {
           <View>
             <View className="flex-row items-center gap-3">
               <Typography variant="h1">SolarX Live</Typography>
-              <TouchableOpacity onPress={() => router.push('/settings' as Href)} className="bg-surface-container/50 p-2 rounded-full border border-white/5">
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Open settings"
+                onPress={() => router.push('/settings' as Href)}
+                className="bg-surface-container/50 p-2 rounded-full border border-white/5"
+              >
                 <MaterialCommunityIcons name="cog" size={20} color="#FFB703" />
               </TouchableOpacity>
             </View>

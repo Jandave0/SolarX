@@ -22,6 +22,8 @@ export function Button({
 
   return (
     <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityState={{ disabled: !!(loading || disabled) }}
       disabled={loading || disabled}
       className={`rounded-2xl px-6 py-4 flex-row items-center justify-center gap-2 ${
         isSolid ? 'bg-primary-container' : 'bg-transparent border border-white/10'
