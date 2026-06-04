@@ -12,6 +12,7 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 import { Typography } from '@/components/ui/Typography';
 import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import { GlassPanel } from '@/components/ui/GlassPanel';
 import { EnergyChip } from '@/components/ui/EnergyChip';
 import { useTiltSensor } from '@/hooks/useTiltSensor';
@@ -186,14 +187,13 @@ export default function OptimizerScreen() {
           </Typography>
 
           <View className="flex-row gap-3 pt-2">
-            <Card
-              className="flex-1 p-3 items-center bg-primary active:opacity-80"
+            <Button
+              className="flex-1 h-14"
               onPress={handleSaveCalibration}
+              loading={isSaving}
             >
-              <Typography variant="body" className="text-background font-bold">
-                {isSaving ? "SAVING..." : "SAVE CALIBRATION"}
-              </Typography>
-            </Card>
+              SAVE CALIBRATION
+            </Button>
           </View>
         </Card>
       </View>
