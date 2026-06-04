@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Typography } from '@/components/ui/Typography';
 import { Card } from '@/components/ui/Card';
@@ -82,6 +82,17 @@ export default function HardwareScreen() {
     }
   };
 
+  const confirmDelete = (id: string, name: string) => {
+    Alert.alert(
+      'Delete Hardware',
+      `Are you sure you want to delete ${name}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => handleDelete(id) },
+      ]
+    );
+  };
+
   const runDiagnostic = async () => {
     setIsAnalyzing(true);
     try {
@@ -134,7 +145,7 @@ export default function HardwareScreen() {
               <Typography variant="body" className="leading-relaxed text-on-surface-variant italic">
                 &quot;{recommendation}&quot;
               </Typography>
-              <TouchableOpacity className="mt-5" onPress={() => setRecommendation(null)}>
+              <TouchableOpacity accessibilityRole="button" className="mt-5" onPress={() => setRecommendation(null)}>
                 <Typography variant="label-caps" className="text-primary-container font-bold">RESET ANALYSIS</Typography>
               </TouchableOpacity>
             </View>
@@ -192,7 +203,7 @@ export default function HardwareScreen() {
                   <Typography variant="h2" className={item.health > 90 ? 'text-primary-container' : 'text-tertiary-container'}>
                     {item.health}%
                   </Typography>
-                  <TouchableOpacity onPress={() => handleDelete(item.id)} className="mt-1">
+                  <TouchableOpacity accessibilityRole="button" onPress={() => confirmDelete(item.id, item.name)} className="mt-1">
                     <Typography variant="label" className="text-text-muted">DELETE</Typography>
                   </TouchableOpacity>
                 </View>
@@ -201,7 +212,7 @@ export default function HardwareScreen() {
           )}
         </View>
 
-        <TouchableOpacity className="items-center py-4" onPress={handleRegister}>
+        <TouchableOpacity accessibilityRole="button" className="items-center py-4" onPress={handleRegister}>
           <Typography variant="body" className="text-primary-container font-bold">+ REGISTER NEW HARDWARE</Typography>
         </TouchableOpacity>
       </View>
