@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import * as SQLite from 'expo-sqlite';
+import * as Crypto from 'expo-crypto';
 
 export interface HardwareItem {
   id: string;
@@ -38,7 +39,8 @@ export const registerHardware = async (
   db: SQLite.SQLiteDatabase,
   item: Omit<HardwareItem, 'id'>
 ) => {
-  const id = Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+  // Use Crypto.randomUUID() for secure, collision-resistant identifier generation
+  const id = Crypto.randomUUID();
   const newItem = { ...item, id };
 
   try {
