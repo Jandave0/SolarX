@@ -66,7 +66,11 @@ export default function SettingsScreen() {
     <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 20 }}>
       <View className="gap-8 pb-10">
         <View className="flex-row items-center gap-4">
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+            onPress={() => router.back()}
+          >
             <MaterialCommunityIcons name="arrow-left" size={24} color="#FFF" />
           </TouchableOpacity>
           <Typography variant="h1">Security</Typography>
@@ -119,7 +123,11 @@ export default function SettingsScreen() {
             </Button>
           </GlassPanel>
 
-          <TouchableOpacity onPress={handleReset} className="items-center py-4">
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={handleReset}
+            className="items-center py-4"
+          >
             <Typography variant="label" className="text-tertiary-container font-bold">RESET TO DEFAULTS</Typography>
           </TouchableOpacity>
         </View>

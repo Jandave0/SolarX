@@ -13,6 +13,8 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
   return (
     <View>
       <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityState={{ expanded: isOpen }}
         className="flex-row items-center gap-1.5"
         onPress={() => setIsOpen((value) => !value)}
         activeOpacity={0.8}>
