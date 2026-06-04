@@ -12,7 +12,9 @@ interface CircularGaugeProps {
   subLabel?: string;
 }
 
-export function CircularGauge({
+// Wrapped in React.memo to prevent unnecessary re-renders when parent contexts
+// (e.g. live data hooks using setInterval) update frequently.
+export const CircularGauge = React.memo(function CircularGauge({
   size = 180,
   strokeWidth = 12,
   percentage = 0,
@@ -100,4 +102,4 @@ export function CircularGauge({
       </View>
     </View>
   );
-}
+});
