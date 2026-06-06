@@ -10,41 +10,35 @@ export interface TiltData {
 
 export const useTiltSensor = (updateInterval = 100) => {
   const [data, setData] = useState<TiltData>({ tilt: 0, roll: 0, azimuth: 0 });
-  const [subscription, setSubscription] = useState<any>(null);
 
   useEffect(() => {
     Accelerometer.setUpdateInterval(updateInterval);
     Magnetometer.setUpdateInterval(updateInterval);
 
-    const subscribe = () => {
-      const accelSub = Accelerometer.addListener(({ x, y, z }) => {
-        // Calculate tilt (pitch) and roll from accelerometer data
-        const pitch = Math.atan2(-x, Math.sqrt(y * y + z * z)) * (180 / Math.PI);
-        const roll = Math.atan2(y, z) * (180 / Math.PI);
-        
-        setData(prev => ({ ...prev, tilt: Math.round(pitch), roll: Math.round(roll) }));
-      });
+    // ⚡ Bolt Optimization: Store subscriptions in local variables instead of React state.
+    // This prevents a memory leak and bridge spam, as the cleanup function would otherwise
+    // close over the initial null state due to the empty dependency array.
+    const accelSub = Accelerometer.addListener(({ x, y, z }) => {
+      // Calculate tilt (pitch) and roll from accelerometer data
+      const pitch = Math.atan2(-x, Math.sqrt(y * y + z * z)) * (180 / Math.PI);
+      const roll = Math.atan2(y, z) * (180 / Math.PI);
 
-      const magSub = Magnetometer.addListener(({ x, y }) => {
-        // Calculate azimuth (heading) from magnetometer data
-        let heading = Math.atan2(y, x) * (180 / Math.PI);
-        heading = heading < 0 ? heading + 360 : heading;
-        
-        setData(prev => ({ ...prev, azimuth: Math.round(heading) }));
-      });
+      setData(prev => ({ ...prev, tilt: Math.round(pitch), roll: Math.round(roll) }));
+    });
 
-      setSubscription({ accelSub, magSub });
-    };
+    const magSub = Magnetometer.addListener(({ x, y }) => {
+      // Calculate azimuth (heading) from magnetometer data
+      let heading = Math.atan2(y, x) * (180 / Math.PI);
+      heading = heading < 0 ? heading + 360 : heading;
 
-    subscribe();
+      setData(prev => ({ ...prev, azimuth: Math.round(heading) }));
+    });
 
     return () => {
-      if (subscription) {
-        subscription.accelSub.remove();
-        subscription.magSub.remove();
-      }
+      accelSub.remove();
+      magSub.remove();
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return data;
 };
