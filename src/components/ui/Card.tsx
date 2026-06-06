@@ -10,6 +10,7 @@ export function Card({ className = '', onPress, children, style, ...props }: Car
     <Pressable 
       onPress={onPress}
       disabled={!onPress}
+      accessibilityRole={onPress ? 'button' : 'none'}
       // @ts-ignore - NativeWind style handling
       className={`bg-[#24242C] rounded-[24px] border border-white/5 p-6 ${className}`}
       style={style}

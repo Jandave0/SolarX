@@ -86,6 +86,7 @@ export default function SettingsScreen() {
             <View className="gap-2">
               <Typography variant="label" className="text-primary-container">GROQ API KEY</Typography>
               <TextInput 
+                accessibilityLabel="GROQ API KEY"
                 value={keys.GROQ_API_KEY}
                 onChangeText={(v) => setKeys(prev => ({ ...prev, GROQ_API_KEY: v }))}
                 placeholder="gsk_..."
@@ -98,6 +99,7 @@ export default function SettingsScreen() {
             <View className="gap-2">
               <Typography variant="label" className="text-primary-container">SUPABASE URL</Typography>
               <TextInput 
+                accessibilityLabel="SUPABASE URL"
                 value={keys.SUPABASE_URL}
                 onChangeText={(v) => setKeys(prev => ({ ...prev, SUPABASE_URL: v }))}
                 placeholder="https://your-project.supabase.co"
@@ -109,6 +111,7 @@ export default function SettingsScreen() {
             <View className="gap-2">
               <Typography variant="label" className="text-primary-container">SUPABASE ANON KEY</Typography>
               <TextInput 
+                accessibilityLabel="SUPABASE ANON KEY"
                 value={keys.SUPABASE_ANON_KEY}
                 onChangeText={(v) => setKeys(prev => ({ ...prev, SUPABASE_ANON_KEY: v }))}
                 placeholder="eyJhbG..."
