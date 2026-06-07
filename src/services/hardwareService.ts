@@ -59,7 +59,7 @@ export const registerHardware = async (
     return newItem;
   } catch (error) {
     console.error('Error registering hardware:', error);
-    throw error;
+    throw new Error('An error occurred while registering hardware.');
   }
 };
 
@@ -75,6 +75,6 @@ export const deleteHardware = async (db: SQLite.SQLiteDatabase, id: string) => {
     }
   } catch (error) {
     console.error('Error deleting hardware:', error);
-    throw error;
+    throw new Error('An error occurred while deleting hardware.');
   }
 };

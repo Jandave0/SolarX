@@ -119,6 +119,6 @@ export const fetchWeatherData = async (lat = 14.5995, lon = 120.9842): Promise<W
        // Ignore
     }
 
-    throw error;
+    throw new Error('An error occurred while fetching weather data.');
   }
 };
