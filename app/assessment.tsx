@@ -85,6 +85,7 @@ export default function AssessmentScreen() {
             <Card>
               <Typography variant="label" className="mb-3 text-primary-container">Property Address</Typography>
               <TextInput
+                accessibilityLabel="Property Address"
                 className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg font-['Plus Jakarta Sans']"
                 placeholder="123 Solar Way, Sunshine State"
                 placeholderTextColor="rgba(255,255,255,0.2)"
@@ -117,6 +118,7 @@ export default function AssessmentScreen() {
               <View>
                 <Typography variant="label" className="mb-3 text-primary-container">Monthly Bill (₱)</Typography>
                 <TextInput
+                  accessibilityLabel="Monthly Bill"
                   className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg font-['Plus Jakarta Sans']"
                   placeholder="e.g. 180"
                   placeholderTextColor="rgba(255,255,255,0.2)"
@@ -129,6 +131,7 @@ export default function AssessmentScreen() {
               <View>
                 <Typography variant="label" className="mb-3 text-primary-container">Consumption (kWh/mo)</Typography>
                 <TextInput
+                  accessibilityLabel="Consumption in kWh per month"
                   className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg font-['Plus Jakarta Sans']"
                   placeholder="e.g. 750"
                   placeholderTextColor="rgba(255,255,255,0.2)"
