@@ -10,14 +10,16 @@ export interface TiltData {
 
 export const useTiltSensor = (updateInterval = 100) => {
   const [data, setData] = useState<TiltData>({ tilt: 0, roll: 0, azimuth: 0 });
-  const [subscription, setSubscription] = useState<any>(null);
 
   useEffect(() => {
     Accelerometer.setUpdateInterval(updateInterval);
     Magnetometer.setUpdateInterval(updateInterval);
 
+    let accelSub: ReturnType<typeof Accelerometer.addListener> | null = null;
+    let magSub: ReturnType<typeof Magnetometer.addListener> | null = null;
+
     const subscribe = () => {
-      const accelSub = Accelerometer.addListener(({ x, y, z }) => {
+      accelSub = Accelerometer.addListener(({ x, y, z }) => {
         // Calculate tilt (pitch) and roll from accelerometer data
         const pitch = Math.atan2(-x, Math.sqrt(y * y + z * z)) * (180 / Math.PI);
         const roll = Math.atan2(y, z) * (180 / Math.PI);
@@ -25,26 +27,22 @@ export const useTiltSensor = (updateInterval = 100) => {
         setData(prev => ({ ...prev, tilt: Math.round(pitch), roll: Math.round(roll) }));
       });
 
-      const magSub = Magnetometer.addListener(({ x, y }) => {
+      magSub = Magnetometer.addListener(({ x, y }) => {
         // Calculate azimuth (heading) from magnetometer data
         let heading = Math.atan2(y, x) * (180 / Math.PI);
         heading = heading < 0 ? heading + 360 : heading;
         
         setData(prev => ({ ...prev, azimuth: Math.round(heading) }));
       });
-
-      setSubscription({ accelSub, magSub });
     };
 
     subscribe();
 
     return () => {
-      if (subscription) {
-        subscription.accelSub.remove();
-        subscription.magSub.remove();
-      }
+      if (accelSub) accelSub.remove();
+      if (magSub) magSub.remove();
     };
-  }, []);
+  }, [updateInterval]);
 
   return data;
 };
