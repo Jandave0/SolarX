@@ -8,6 +8,7 @@ interface CardProps extends ViewProps {
 export function Card({ className = '', onPress, children, style, ...props }: CardProps) {
   return (
     <Pressable 
+      accessibilityRole={onPress ? 'button' : 'none'}
       onPress={onPress}
       disabled={!onPress}
       // @ts-ignore - NativeWind style handling
